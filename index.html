@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Тренажёр по теории графов — разнообразие задач</title>
+</head>
+
+<body>
+
+    <h1>Тренажёр по теории графов</h1>
+
+    <button id="newTaskBtn">Новая задача</button>
+
+    <p id="taskDesc"></p>
+
+    <svg id="graph" width="500" height="400" style="border:1px solid black;"></svg>
+
+    <p>Кликайте по вершинам, чтобы выбрать путь.</p>
+
+    <button id="checkBtn">Проверить путь</button>
+    <p id="result"></p>
+
+    <script>
+        // Набор задач с графами и условиями
+        const tasks = [
+            {
+                level: 'easy',
+                type: 'simple',
+                description: "Найди путь от A до D без повторения рёбер.",
+                graph: {
+                    A: { x: 50, y: 50, edges: ['B', 'C'] },
+                    B: { x: 150, y: 50, edges: ['A', 'D'] },
+                    C: { x: 50, y: 150, edges: ['A', 'D'] },
+                    D: { x: 150, y: 150, edges: ['B', 'C'] }
+                },
+                start: 'A',
+                end: 'D'
+            },
+            {
+                level: 'easy',
+                type: 'simple',
+                description: "Найди путь от X до Z без повторения рёбер.",
+                graph: {
+                    X: { x: 50, y: 50, edges: ['Y'] },
+                    Y: { x: 150, y: 50, edges: ['X', 'Z', 'W'] },
+                    W: { x: 150, y: 150, edges: ['Y', 'Z'] },
+                    Z: { x: 50, y: 150, edges: ['Y', 'W'] }
+                },
+                start: 'X',
+                end: 'Z'
+            },
+            {
+                level: 'medium',
+                type: 'eulerian',
+                description: "Найди эйлеров путь (каждое ребро один раз).",
+                graph: {
+                    A: { x: 50, y: 50, edges: ['B', 'C'] },
+                    B: { x: 150, y: 50, edges: ['A', 'C', 'D'] },
+                    C: { x: 100, y: 150, edges: ['A', 'B', 'D'] },
+                    D: { x: 200, y: 150, edges: ['B', 'C'] }
+                },
+                start: 'A',
+                end: 'D'
+            },
+            {
+                level: 'hard',
+                type: 'hamiltonian',
+                description: "Найди гамильтонов цикл (по одному разу по вершинам и возврат в начало).",
+                graph: {
+                    A: { x: 100, y: 50, edges: ['B', 'C', 'D'] },
+                    B: { x: 200, y: 50, edges: ['A', 'C'] },
+                    C: { x: 200, y: 150, edges: ['A', 'B', 'D'] },
+                    D: { x: 100, y: 150, edges: ['A', 'C'] }
+                },
+                start: 'A',
+                end: 'A'
+            },
+            {
+                level: 'medium',
+                type: 'shortest',
+                description: "Найди кратчайший путь от A до E.",
+                graph: {
+                    A: { x: 50, y: 50, edges: ['B', 'C'] },
+                    B: { x: 150, y: 50, edges: ['A', 'D'] },
+                    C: { x: 50, y: 150, edges: ['A', 'D'] },
+                    D: { x: 150, y: 150, edges: ['B', 'C', 'E'] },
+                    E: { x: 250, y: 100, edges: ['D'] }
+                },
+                start: 'A',
+                end: 'E'
+            }
+        ];
+
+        let currentTask = null;
+        let path = [];
+
+        const svg = document.getElementById('graph');
+        const taskDesc = document.getElementById('taskDesc');
+        const result = document.getElementById('result');
+
+        function clearSVG() {
+            while (svg.firstChild) {
+                svg.removeChild(svg.firstChild);
+            }
+        }
+
+        function drawGraph(graph) {
+            clearSVG();
+            for (const v in graph) {
+                const { x: x1, y: y1, edges } = graph[v];
+                edges.forEach(u => {
+                    if (v < u) {
+                        const { x: x2, y: y2 } = graph[u];
+                        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                        line.setAttribute("x1", x1);
+                        line.setAttribute("y1", y1);
+                        line.setAttribute("x2", x2);
+                        line.setAttribute("y2", y2);
+                        line.setAttribute("stroke", "black");
+                        line.setAttribute("stroke-width", "2");
+                        svg.appendChild(line);
+                    }
+                });
+            }
+
+            for (const v in graph) {
+                const { x, y } = graph[v];
+                const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                circle.setAttribute("cx", x);
+                circle.setAttribute("cy", y);
+                circle.setAttribute("r", 15);
+                circle.setAttribute("stroke", "black");
+                circle.setAttribute("fill", "lightblue");
+                circle.style.cursor = "pointer";
+                circle.id = "vertex-" + v;
+                circle.setAttribute("data-name", v);
+                svg.appendChild(circle);
+
+                const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                text.setAttribute("x", x);
+                text.setAttribute("y", y + 5);
+                text.setAttribute("text-anchor", "middle");
+                text.setAttribute("font-size", "14");
+                text.textContent = v;
+                svg.appendChild(text);
+            }
+        }
+
+        function startTask(task) {
+            currentTask = task;
+            path = [];
+            taskDesc.textContent = task.description + ` Начинайте с вершины ${task.start}, нужно дойти до ${task.end}.`;
+            result.textContent = "";
+            drawGraph(task.graph);
+            svg.querySelectorAll('circle').forEach(c => {
+                c.addEventListener('click', onVertexClick);
+                c.setAttribute("fill", "lightblue");
+            });
+        }
+
+        function onVertexClick(event) {
+            const v = event.target.getAttribute('data-name');
+            if (path.length === 0) {
+                if (v !== currentTask.start) {
+                    alert(`Нужно начать с вершины ${currentTask.start}`);
+                    return;
+                }
+                path.push(v);
+                event.target.setAttribute("fill", "orange");
+            } else {
+                const last = path[path.length - 1];
+                if (currentTask.graph[last].edges.includes(v)) {
+                    path.push(v);
+                    event.target.setAttribute("fill", "orange");
+                } else {
+                    alert("Такого ребра нет!");
+                }
+            }
+        }
+
+        function checkPath() {
+            if (!currentTask || path.length === 0) {
+                alert("Выберите путь");
+                return;
+            }
+
+            const { type, start, end, graph } = currentTask;
+
+            if (path[0] !== start) {
+                result.textContent = `Путь должен начинаться в вершине ${start}`;
+                return;
+            }
+
+            if (path[path.length - 1] !== end) {
+                result.textContent = `Путь должен заканчиваться в вершине ${end}`;
+                return;
+            }
+
+            for (let i = 0; i < path.length - 1; i++) {
+                let a = path[i], b = path[i + 1];
+                if (!graph[a].edges.includes(b)) {
+                    result.textContent = `Между ${a} и ${b} нет ребра.`;
+                    return;
+                }
+            }
+
+            if (type === 'simple') {
+                for (let i = 0; i < path.length - 1; i++) {
+                    let a = path[i], b = path[i + 1];
+                    for (let j = i + 1; j < path.length - 1; j++) {
+                        let c = path[j], d = path[j + 1];
+                        if ((a === c && b === d) || (a === d && b === c)) {
+                            result.textContent = "Ребро повторяется в пути, это запрещено.";
+                            return;
+                        }
+                    }
+                }
+                result.textContent = "Отлично! Вы решили задачу.";
+            } else if (type === 'eulerian') {
+                const usedEdges = new Set();
+                for (let i = 0; i < path.length - 1; i++) {
+                    const edge = [path[i], path[i + 1]].sort().join('-');
+                    usedEdges.add(edge);
+                }
+                let totalEdges = 0;
+                const counted = new Set();
+                for (const v in graph) {
+                    graph[v].edges.forEach(u => {
+                        const edge = [v, u].sort().join('-');
+                        if (!counted.has(edge)) {
+                            totalEdges++;
+                            counted.add(edge);
+                        }
+                    });
+                }
+                if (usedEdges.size === totalEdges) {
+                    result.textContent = "Поздравляем! Найден эйлеров путь.";
+                } else {
+                    result.textContent = `Не все рёбра пройдены. Пройдено ${usedEdges.size}, а нужно ${totalEdges}.`;
+                }
+            } else if (type === 'hamiltonian') {
+                const visited = new Set(path);
+                if (visited.size === Object.keys(graph).length && path[0] === path[path.length - 1]) {
+                    result.textContent = "Отлично! Найден гамильтонов цикл.";
+                } else {
+                    result.textContent = "Это не гамильтонов цикл. Убедитесь, что все вершины пройдены один раз и путь замкнут.";
+                }
+            } else if (type === 'shortest') {
+                result.textContent = "Путь принят, но кратчайший ли он — не проверяется (эта функция ещё не реализована).";
+            } else {
+                result.textContent = "Тип задачи не распознан.";
+            }
+        }
+
+        document.getElementById('newTaskBtn').addEventListener('click', () => {
+            const task = tasks[Math.floor(Math.random() * tasks.length)];
+            startTask(task);
+        });
+
+        document.getElementById('checkBtn').addEventListener('click', () => {
+            checkPath();
+        });
+
+        startTask(tasks[0]);
+    </script>
+
+</body>
+
+</html>
