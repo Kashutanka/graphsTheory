@@ -3,268 +3,143 @@
 
 <head>
     <meta charset="UTF-8" />
-    <title>Тренажёр по теории графов — разнообразие задач</title>
+    <title>Теория графов — Задачи</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="style.css">
+
 </head>
 
 <body>
 
-    <h1>Тренажёр по теории графов</h1>
+    <h1>Теория графов — Полное руководство</h1>
 
-    <button id="newTaskBtn">Новая задача</button>
+    <div class="theory-section">
+        <h2>Основные понятия теории графов</h2>
 
-    <p id="taskDesc"></p>
+        <h3>1. Что такое граф?</h3>
+        <p><span class="term">Граф</span> — это математическая структура, состоящая из:</p>
+        <ul>
+            <li><span class="term">Вершин (узлов)</span> — основных элементов графа</li>
+            <li><span class="term">Рёбер</span> — связей между вершинами</li>
+        </ul>
 
-    <svg id="graph" width="500" height="400" style="border:1px solid black;"></svg>
+        <div class="example">
+            <p>Пример: В социальной сети люди — это вершины, а дружеские связи — рёбра.</p>
+        </div>
 
-    <p>Кликайте по вершинам, чтобы выбрать путь.</p>
+        <h3>2. Виды графов</h3>
+        <p><span class="term">Неориентированные графы</span>:</p>
+        <ul>
+            <li>Рёбра не имеют направления</li>
+            <li>Ребро (A,B) = ребру (B,A)</li>
+            <li>Пример: Дороги между городами</li>
+        </ul>
 
-    <button id="checkBtn">Проверить путь</button>
-    <p id="result"></p>
+        <p><span class="term">Ориентированные графы (орграфы)</span>:</p>
+        <ul>
+            <li>Рёбра имеют направление</li>
+            <li>Дуга A→B не то же самое, что B→A</li>
+            <li>Пример: Односторонние улицы</li>
+        </ul>
 
-    <script>
-        // Набор задач с графами и условиями
-        const tasks = [
-            {
-                level: 'easy',
-                type: 'simple',
-                description: "Найди путь от A до D без повторения рёбер.",
-                graph: {
-                    A: { x: 50, y: 50, edges: ['B', 'C'] },
-                    B: { x: 150, y: 50, edges: ['A', 'D'] },
-                    C: { x: 50, y: 150, edges: ['A', 'D'] },
-                    D: { x: 150, y: 150, edges: ['B', 'C'] }
-                },
-                start: 'A',
-                end: 'D'
-            },
-            {
-                level: 'easy',
-                type: 'simple',
-                description: "Найди путь от X до Z без повторения рёбер.",
-                graph: {
-                    X: { x: 50, y: 50, edges: ['Y'] },
-                    Y: { x: 150, y: 50, edges: ['X', 'Z', 'W'] },
-                    W: { x: 150, y: 150, edges: ['Y', 'Z'] },
-                    Z: { x: 50, y: 150, edges: ['Y', 'W'] }
-                },
-                start: 'X',
-                end: 'Z'
-            },
-            {
-                level: 'medium',
-                type: 'eulerian',
-                description: "Найди эйлеров путь (каждое ребро один раз).",
-                graph: {
-                    A: { x: 50, y: 50, edges: ['B', 'C'] },
-                    B: { x: 150, y: 50, edges: ['A', 'C', 'D'] },
-                    C: { x: 100, y: 150, edges: ['A', 'B', 'D'] },
-                    D: { x: 200, y: 150, edges: ['B', 'C'] }
-                },
-                start: 'A',
-                end: 'D'
-            },
-            {
-                level: 'hard',
-                type: 'hamiltonian',
-                description: "Найди гамильтонов цикл (по одному разу по вершинам и возврат в начало).",
-                graph: {
-                    A: { x: 100, y: 50, edges: ['B', 'C', 'D'] },
-                    B: { x: 200, y: 50, edges: ['A', 'C'] },
-                    C: { x: 200, y: 150, edges: ['A', 'B', 'D'] },
-                    D: { x: 100, y: 150, edges: ['A', 'C'] }
-                },
-                start: 'A',
-                end: 'A'
-            },
-            {
-                level: 'medium',
-                type: 'shortest',
-                description: "Найди кратчайший путь от A до E.",
-                graph: {
-                    A: { x: 50, y: 50, edges: ['B', 'C'] },
-                    B: { x: 150, y: 50, edges: ['A', 'D'] },
-                    C: { x: 50, y: 150, edges: ['A', 'D'] },
-                    D: { x: 150, y: 150, edges: ['B', 'C', 'E'] },
-                    E: { x: 250, y: 100, edges: ['D'] }
-                },
-                start: 'A',
-                end: 'E'
-            }
-        ];
+        <p><span class="term">Взвешенные графы</span>:</p>
+        <ul>
+            <li>Каждому ребру присвоен вес (число)</li>
+            <li>Пример: Расстояние между городами</li>
+        </ul>
 
-        let currentTask = null;
-        let path = [];
+        <h3>3. Основные характеристики графов</h3>
+        <p><span class="term">Степень вершины</span> — количество рёбер, инцидентных вершине:</p>
+        <ul>
+            <li>Для орграфов: полустепень исхода и захода</li>
+            <li>Изолированная вершина — степень 0</li>
+            <li>Висячая вершина — степень 1</li>
+        </ul>
 
-        const svg = document.getElementById('graph');
-        const taskDesc = document.getElementById('taskDesc');
-        const result = document.getElementById('result');
+        <p><span class="term">Путь</span> — последовательность вершин, где каждые две соседние соединены ребром:</p>
+        <ul>
+            <li>Простой путь — без повторения вершин</li>
+            <li>Цикл — путь, где начальная и конечная вершины совпадают</li>
+        </ul>
 
-        function clearSVG() {
-            while (svg.firstChild) {
-                svg.removeChild(svg.firstChild);
-            }
-        }
+        <h2>Важные алгоритмы и понятия</h2>
 
-        function drawGraph(graph) {
-            clearSVG();
-            for (const v in graph) {
-                const { x: x1, y: y1, edges } = graph[v];
-                edges.forEach(u => {
-                    if (v < u) {
-                        const { x: x2, y: y2 } = graph[u];
-                        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-                        line.setAttribute("x1", x1);
-                        line.setAttribute("y1", y1);
-                        line.setAttribute("x2", x2);
-                        line.setAttribute("y2", y2);
-                        line.setAttribute("stroke", "black");
-                        line.setAttribute("stroke-width", "2");
-                        svg.appendChild(line);
-                    }
-                });
-            }
+        <h3>1. Обход графа</h3>
+        <p><span class="term">Поиск в ширину (BFS)</span>:</p>
+        <ol>
+            <li>Начинаем с начальной вершины</li>
+            <li>Посещаем все соседние вершины</li>
+            <li>Повторяем для каждой следующей "волны" вершин</li>
+        </ol>
 
-            for (const v in graph) {
-                const { x, y } = graph[v];
-                const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-                circle.setAttribute("cx", x);
-                circle.setAttribute("cy", y);
-                circle.setAttribute("r", 15);
-                circle.setAttribute("stroke", "black");
-                circle.setAttribute("fill", "lightblue");
-                circle.style.cursor = "pointer";
-                circle.id = "vertex-" + v;
-                circle.setAttribute("data-name", v);
-                svg.appendChild(circle);
+        <p><span class="term">Поиск в глубину (DFS)</span>:</p>
+        <ol>
+            <li>Начинаем с начальной вершины</li>
+            <li>Идём "вглубь" по одному направлению</li>
+            <li>Возвращаемся, когда дальше идти некуда</li>
+        </ol>
 
-                const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-                text.setAttribute("x", x);
-                text.setAttribute("y", y + 5);
-                text.setAttribute("text-anchor", "middle");
-                text.setAttribute("font-size", "14");
-                text.textContent = v;
-                svg.appendChild(text);
-            }
-        }
+        <h3>2. Связность графа</h3>
+        <p><span class="term">Связный граф</span> — между любыми двумя вершинами существует путь.</p>
+        <p><span class="term">Компонента связности</span> — максимальный связный подграф.</p>
 
-        function startTask(task) {
-            currentTask = task;
-            path = [];
-            taskDesc.textContent = task.description + ` Начинайте с вершины ${task.start}, нужно дойти до ${task.end}.`;
-            result.textContent = "";
-            drawGraph(task.graph);
-            svg.querySelectorAll('circle').forEach(c => {
-                c.addEventListener('click', onVertexClick);
-                c.setAttribute("fill", "lightblue");
-            });
-        }
+        <div class="example">
+            <p>Пример: В графе друзей из разных стран могут быть отдельные компоненты связности для каждой страны.</p>
+        </div>
 
-        function onVertexClick(event) {
-            const v = event.target.getAttribute('data-name');
-            if (path.length === 0) {
-                if (v !== currentTask.start) {
-                    alert(`Нужно начать с вершины ${currentTask.start}`);
-                    return;
-                }
-                path.push(v);
-                event.target.setAttribute("fill", "orange");
-            } else {
-                const last = path[path.length - 1];
-                if (currentTask.graph[last].edges.includes(v)) {
-                    path.push(v);
-                    event.target.setAttribute("fill", "orange");
-                } else {
-                    alert("Такого ребра нет!");
-                }
-            }
-        }
+        <h3>3. Деревья</h3>
+        <p><span class="term">Дерево</span> — связный граф без циклов.</p>
+        <p>Свойства деревьев:</p>
+        <ul>
+            <li>Между любыми двумя вершинами ровно один путь</li>
+            <li>Число рёбер = число вершин - 1</li>
+            <li>Добавление любого нового ребра создаёт цикл</li>
+        </ul>
 
-        function checkPath() {
-            if (!currentTask || path.length === 0) {
-                alert("Выберите путь");
-                return;
-            }
+        <h3>4. Кратчайшие пути</h3>
+        <p><span class="term">Алгоритм Дейкстры</span> — находит кратчайшие пути от одной вершины до всех остальных.</p>
+        <p>Условия:</p>
+        <ul>
+            <li>Граф должен быть взвешенным</li>
+            <li>Веса рёбер должны быть неотрицательными</li>
+        </ul>
 
-            const { type, start, end, graph } = currentTask;
+        <h3>5. Двудольные графы</h3>
+        <p><span class="term">Двудольный граф</span> — вершины можно разделить на два множества так, что рёбра соединяют
+            только вершины из разных множеств.</p>
+        <p>Критерий двудольности:</p>
+        <ul>
+            <li>Граф двудольный ⇔ не содержит циклов нечётной длины</li>
+            <li>Можно проверить раскраской в два цвета</li>
+        </ul>
+    </div>
 
-            if (path[0] !== start) {
-                result.textContent = `Путь должен начинаться в вершине ${start}`;
-                return;
-            }
+    <div id="taskList">
+        <h2>Практические задачи:</h2>
+    </div>
 
-            if (path[path.length - 1] !== end) {
-                result.textContent = `Путь должен заканчиваться в вершине ${end}`;
-                return;
-            }
+    <!-- Остальная часть документа остается без изменений -->
+    <div id="taskBlock" style="display:none;">
+        <button id="backBtn">← Назад к выбору задач</button>
+        <h2 id="taskTitle"></h2>
+        <svg id="graphSvg" width="600" height="400"></svg>
 
-            for (let i = 0; i < path.length - 1; i++) {
-                let a = path[i], b = path[i + 1];
-                if (!graph[a].edges.includes(b)) {
-                    result.textContent = `Между ${a} и ${b} нет ребра.`;
-                    return;
-                }
-            }
+        <p>Выбранные вершины/путь: <span id="pathDisplay"></span></p>
 
-            if (type === 'simple') {
-                for (let i = 0; i < path.length - 1; i++) {
-                    let a = path[i], b = path[i + 1];
-                    for (let j = i + 1; j < path.length - 1; j++) {
-                        let c = path[j], d = path[j + 1];
-                        if ((a === c && b === d) || (a === d && b === c)) {
-                            result.textContent = "Ребро повторяется в пути, это запрещено.";
-                            return;
-                        }
-                    }
-                }
-                result.textContent = "Отлично! Вы решили задачу.";
-            } else if (type === 'eulerian') {
-                const usedEdges = new Set();
-                for (let i = 0; i < path.length - 1; i++) {
-                    const edge = [path[i], path[i + 1]].sort().join('-');
-                    usedEdges.add(edge);
-                }
-                let totalEdges = 0;
-                const counted = new Set();
-                for (const v in graph) {
-                    graph[v].edges.forEach(u => {
-                        const edge = [v, u].sort().join('-');
-                        if (!counted.has(edge)) {
-                            totalEdges++;
-                            counted.add(edge);
-                        }
-                    });
-                }
-                if (usedEdges.size === totalEdges) {
-                    result.textContent = "Поздравляем! Найден эйлеров путь.";
-                } else {
-                    result.textContent = `Не все рёбра пройдены. Пройдено ${usedEdges.size}, а нужно ${totalEdges}.`;
-                }
-            } else if (type === 'hamiltonian') {
-                const visited = new Set(path);
-                if (visited.size === Object.keys(graph).length && path[0] === path[path.length - 1]) {
-                    result.textContent = "Отлично! Найден гамильтонов цикл.";
-                } else {
-                    result.textContent = "Это не гамильтонов цикл. Убедитесь, что все вершины пройдены один раз и путь замкнут.";
-                }
-            } else if (type === 'shortest') {
-                result.textContent = "Путь принят, но кратчайший ли он — не проверяется (эта функция ещё не реализована).";
-            } else {
-                result.textContent = "Тип задачи не распознан.";
-            }
-        }
+        <div id="controls">
+            <button id="undoBtn">Отменить выбор</button>
+            <button id="checkBtn">Проверить</button>
+            <button id="showTheoryBtn">Показать теорию</button>
+        </div>
 
-        document.getElementById('newTaskBtn').addEventListener('click', () => {
-            const task = tasks[Math.floor(Math.random() * tasks.length)];
-            startTask(task);
-        });
+        <div id="result"></div>
+        <div id="theoryBlock" style="display:none;">
+            <h3>Теория</h3>
+            <p id="theoryText"></p>
+        </div>
+    </div>
 
-        document.getElementById('checkBtn').addEventListener('click', () => {
-            checkPath();
-        });
-
-        startTask(tasks[0]);
-    </script>
-
+    <script src="script.js"></script>
 </body>
 
 </html>

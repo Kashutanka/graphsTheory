@@ -1,0 +1,242 @@
+/* Основные стили */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    color: #3b4143;
+    background-color: #fefffb;
+    margin: 0;
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+h1,
+h2,
+h3,
+h4 {
+    color: #48484a;
+    margin-top: 1.5em;
+}
+
+h1 {
+    font-size: 2.2rem;
+    border-bottom: 2px solid #ee3838;
+    padding-bottom: 10px;
+    margin-bottom: 1em;
+}
+
+h2 {
+    font-size: 1.8rem;
+    border-left: 4px solid #ee3838;
+    padding-left: 15px;
+    margin: 1.5em 0;
+}
+
+h3 {
+    font-size: 1.4rem;
+    color: #3b4143;
+    margin: 1.3em 0 0.8em;
+}
+
+/* Секция с теорией */
+.theory-section {
+    background-color: rgba(238, 56, 56, 0.05);
+    padding: 25px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+    border: 1px solid rgba(238, 56, 56, 0.2);
+}
+
+.term {
+    font-weight: bold;
+    color: #ee3838;
+}
+
+.example {
+    background-color: rgba(255, 255, 255, 0.7);
+    padding: 15px;
+    border-left: 4px solid #ee3838;
+    margin: 15px 0;
+    border-radius: 0 4px 4px 0;
+    font-style: italic;
+}
+
+/* Стили для SVG контейнера */
+#graphSvg {
+    display: block;
+    margin: 20px auto;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    overflow: visible;
+    /* Чтобы не обрезалось содержимое */
+}
+
+/* Стили для вершин */
+.node {
+    fill: #ee3838;
+    stroke: #3b4143;
+    stroke-width: 2;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.node:hover {
+    fill: #ff6b6b;
+}
+
+.node.selected {
+    fill: #48484a;
+    stroke: #ee3838;
+    stroke-width: 3;
+}
+
+/* Стили для текста */
+#graphSvg text {
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    font-weight: bold;
+    fill: #fefffb;
+    pointer-events: none;
+    user-select: none;
+}
+
+/* Списки */
+ul,
+ol {
+    padding-left: 25px;
+    margin: 15px 0;
+}
+
+li {
+    margin-bottom: 8px;
+}
+
+/* Блок задач */
+#taskList {
+    margin-top: 40px;
+}
+
+#taskList h2 {
+    margin-bottom: 20px;
+}
+
+#taskList button {
+    display: block;
+    width: 100%;
+    max-width: 600px;
+    margin: 10px auto;
+    padding: 12px;
+    background-color: #ee3838;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#taskList button:hover {
+    background-color: #d63030;
+}
+
+#taskBlock {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* Центрирование по горизонтали */
+    justify-content: center;
+    /* Центрирование по вертикали */
+    min-height: 80vh;
+    /* Чтобы было пространство для центрирования */
+}
+
+/* Блок с задачей */
+
+
+#taskTitle {
+    color: #48484a;
+    margin-bottom: 20px;
+}
+
+
+/* Элементы управления */
+#controls {
+    display: flex;
+    gap: 10px;
+    margin: 20px 0;
+    flex-wrap: wrap;
+}
+
+#controls button {
+    padding: 10px 15px;
+    background-color: #48484a;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#controls button:hover {
+    background-color: #3b4143;
+}
+
+#backBtn {
+    display: block;
+    width: 100%;
+    max-width: 600px;
+    margin: 10px auto;
+    padding: 12px;
+    background-color: #ee3838;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#backBtn:hover {
+    background-color: #d63030 !important;
+}
+
+/* Результат и теория */
+#result {
+    padding: 15px;
+    margin: 20px 0;
+    border-radius: 5px;
+    background-color: rgba(72, 72, 74, 0.1);
+}
+
+#theoryBlock {
+    padding: 20px;
+    background-color: rgba(238, 56, 56, 0.05);
+    border-radius: 8px;
+    margin-top: 20px;
+    border: 1px solid rgba(238, 56, 56, 0.2);
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    body {
+        padding: 15px;
+    }
+
+    h1 {
+        font-size: 1.8rem;
+    }
+
+    h2 {
+        font-size: 1.5rem;
+    }
+
+    #controls {
+        flex-direction: column;
+    }
+
+    #graphSvg {
+        width: 100%;
+        height: auto;
+    }
+}
